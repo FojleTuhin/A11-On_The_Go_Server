@@ -59,6 +59,21 @@ async function run() {
             res.send(result)
         })
 
+
+        app.get('/wishlist', async (req, res) => {
+            const cursor = await wishlistCollection.find().toArray();
+            res.send(cursor);
+        })
+
+        //get wishlist for a specific person
+        app.get('/wishlist/:email', async(req, res)=>{
+            const email = req.params.email
+            const query = { wishedEmail: email}
+            const result = await wishlistCollection.find(query).toArray();
+            res.send(result)
+
+        })
+
         //insert blogs in database
         app.post('/blog', async (req, res) => {
             const newBlog = req.body;
