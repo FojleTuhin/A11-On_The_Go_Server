@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
@@ -30,6 +30,66 @@ async function run() {
     // await client.connect();
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
+
+
+    const blogsCollection = client.db('On-the-go').collection('blogs');
+    const commentCollection = client.db('On-the-go').collection('comments');
+
+
+    //get all blogs from database
+    app.get('/blogs', async (req, res)=>{
+        const cursor =await blogsCollection.find().toArray();
+        res.send(cursor);
+    })
+
+    //get a single data by id
+
+    app.get('/blogs/:id', async(req, res)=>{
+        const id = req.params.id
+        const query={_id: new ObjectId(id)}
+        const result= await blogsCollection.findOne(query)
+        res.send(result)
+    })
+
+
+    //insert blogs in database
+    app.post('/blog', async(req, res)=>{
+        const newBlog = req.body;
+        console.log(newBlog);
+        const result = await blogsCollection.insertOne(newBlog);
+        res.send(result)
+    })
+
+
+
+    // insert comment in new Collection
+    app.post('/comment', async(req, res)=>{
+        const newComment = req.body;
+        console.log(newComment);
+        const result = await commentCollection.insertOne(newComment);
+        res.send(result)
+    })
+
+
+    //get comment for a specific blog
+    app.get('/comments', async(req, res)=>{
+        const result= await commentCollection.find().toArray();
+        res.send(result)
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
