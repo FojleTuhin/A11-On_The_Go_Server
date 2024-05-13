@@ -41,7 +41,13 @@ async function run() {
             res.send(cursor);
         })
 
-        //get data by word count
+
+
+        app.get('/feature', async (req, res) => {
+            const cursor = await blogsCollection.find().toArray();
+            res.send(cursor);
+        })
+
         
 
         //Update a single data
