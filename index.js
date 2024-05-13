@@ -9,11 +9,9 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-console.log(process.env.DB_PASS);
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.z7hla77.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-console.log(uri);
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -102,7 +100,13 @@ async function run() {
 
 
 
-
+        // remove blog from wishlist
+        app.delete('/wishlist/:id',async (req, res)=>{
+            const id = req.params.id
+            const query = { _id: new ObjectId(id)}
+            const result = await wishlistCollection.deleteOne(query);
+            res.send(result);
+        })
 
 
 
