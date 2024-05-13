@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('dotenv').config();
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId, AggregationCursor } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
@@ -40,6 +40,9 @@ async function run() {
             const cursor = await blogsCollection.find().toArray();
             res.send(cursor);
         })
+
+        //get data by word count
+        
 
         //Update a single data
         app.put('/updateBlog/:id', async (req, res) => {
