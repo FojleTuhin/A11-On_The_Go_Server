@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const app = express();
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -10,7 +11,8 @@ app.use(express.json());
 
 
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "tuhin-on-the-go.netlify.app"]
+    origin: ["http://localhost:5173", "http://localhost:5174", "tuhin-on-the-go.netlify.app"],
+    credentials: true
 }));
 
 
@@ -39,19 +41,46 @@ async function run() {
         const wishlistCollection = client.db('On-the-go').collection('wishList');
         const homePageComment = client.db('On-the-go').collection('homePageComment');
 
+        //jwt generate
+        app.post('/jwt', async (req, res) => {
+            const user = req.body
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
+                expiresIn: '365d'
+            })
+
+            const cookieOptions = {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+            };
+
+            res.cookie("token", token, cookieOptions)
+                .send({ success: true });
+        })
+
+
+        //clearing Token
+        app.post("/logout", async (req, res) => {
+            const user = req.body;
+            console.log("logging out", user);
+            res
+                .clearCookie("token", { ...cookieOptions, maxAge: 0 })
+                .send({ success: true });
+        });
+
 
         //get all blogs from database
         app.get('/blogs', async (req, res) => {
-            const filter= req.query.filter;
-            const search= req.query.search;
+            const filter = req.query.filter;
+            const search = req.query.search;
 
 
 
 
-            let query ={
-                blog_category:{$regex: search, $options:'i'}
+            let query = {
+                blog_category: { $regex: search, $options: 'i' }
             }
-            if(filter) query.category = filter
+            if (filter) query.category = filter
 
             const cursor = await blogsCollection.find(query).toArray();
             res.send(cursor);
