@@ -33,6 +33,7 @@ async function run() {
         const blogsCollection = client.db('On-the-go').collection('blogs');
         const commentCollection = client.db('On-the-go').collection('comments');
         const wishlistCollection = client.db('On-the-go').collection('wishList');
+        const homePageComment = client.db('On-the-go').collection('homePageComment');
 
 
         //get all blogs from database
@@ -48,7 +49,7 @@ async function run() {
             res.send(cursor);
         })
 
-        
+
 
         //Update a single data
         app.put('/updateBlog/:id', async (req, res) => {
@@ -82,9 +83,15 @@ async function run() {
         })
 
         //get comment for a specific blog
-
         app.get('/comments', async (req, res) => {
             const result = await commentCollection.find().toArray();
+            res.send(result)
+        })
+
+        
+        //get all comment for a home page 
+        app.get('/homePageComment', async (req, res) => {
+            const result = await homePageComment.find().toArray();
             res.send(result)
         })
 
@@ -119,6 +126,15 @@ async function run() {
             const newComment = req.body;
             console.log(newComment);
             const result = await commentCollection.insertOne(newComment);
+            res.send(result)
+        })
+
+
+        // insert comment in home page Collection
+        app.post('/homePageComment', async (req, res) => {
+            const newComment = req.body;
+            console.log(newComment);
+            const result = await homePageComment.insertOne(newComment);
             res.send(result)
         })
 
