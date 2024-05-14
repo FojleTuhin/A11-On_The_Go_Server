@@ -10,8 +10,8 @@ app.use(express.json());
 
 
 app.use(cors({
-    origin:["http://localhost:5173","http://localhost:5174"]
-  }));
+    origin: ["http://localhost:5173", "http://localhost:5174", "tuhin-on-the-go.netlify.app"]
+}));
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.z7hla77.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -42,7 +42,18 @@ async function run() {
 
         //get all blogs from database
         app.get('/blogs', async (req, res) => {
-            const cursor = await blogsCollection.find().toArray();
+            const filter= req.query.filter;
+            const search= req.query.search;
+
+
+
+
+            let query ={
+                blog_category:{$regex: search, $options:'i'}
+            }
+            if(filter) query.category = filter
+
+            const cursor = await blogsCollection.find(query).toArray();
             res.send(cursor);
         })
 
@@ -92,7 +103,7 @@ async function run() {
             res.send(result)
         })
 
-        
+
         //get all comment for a home page 
         app.get('/homePageComment', async (req, res) => {
             const result = await homePageComment.find().toArray();
