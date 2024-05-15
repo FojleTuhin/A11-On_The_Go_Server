@@ -11,8 +11,9 @@ app.use(express.json());
 
 
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "tuhin-on-the-go.netlify.app"],
-    // credentials: true
+    // origin: ["http://localhost:5173", "http://localhost:5174", "https://tuhin-on-the-go.netlify.app"],
+    origin:"*",
+    credentials: true
 }));
 
 
