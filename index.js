@@ -12,7 +12,7 @@ app.use(express.json());
 
 app.use(cors({
     origin: ["http://localhost:5173", "http://localhost:5174", "tuhin-on-the-go.netlify.app"],
-    credentials: true
+    // credentials: true
 }));
 
 
@@ -41,41 +41,12 @@ async function run() {
         const wishlistCollection = client.db('On-the-go').collection('wishList');
         const homePageComment = client.db('On-the-go').collection('homePageComment');
 
-        //jwt generate
-        app.post('/jwt', async (req, res) => {
-            const user = req.body
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
-                expiresIn: '365d'
-            })
-
-            const cookieOptions = {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-            };
-
-            res.cookie("token", token, cookieOptions)
-                .send({ success: true });
-        })
 
 
-        //clearing Token
-        app.post("/logout", async (req, res) => {
-            const user = req.body;
-            console.log("logging out", user);
-            res
-                .clearCookie("token", { ...cookieOptions, maxAge: 0 })
-                .send({ success: true });
-        });
-
-
-        //get all blogs from database
+        //get all blogs from database and search with filter
         app.get('/blogs', async (req, res) => {
             const filter = req.query.filter;
             const search = req.query.search;
-
-
-
 
             let query = {
                 title: { $regex: search, $options: 'i' }
@@ -87,11 +58,18 @@ async function run() {
         })
 
 
-
+        //get all blogs for featured list
         app.get('/feature', async (req, res) => {
             const cursor = await blogsCollection.find().toArray();
             res.send(cursor);
         })
+
+
+        app.get('/homeBlog', async (req, res) => {
+            const cursor = await blogsCollection.find().toArray();
+            res.send(cursor);
+        })
+
 
 
 
