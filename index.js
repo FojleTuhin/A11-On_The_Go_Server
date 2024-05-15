@@ -78,7 +78,7 @@ async function run() {
 
 
             let query = {
-                blog_category: { $regex: search, $options: 'i' }
+                title: { $regex: search, $options: 'i' }
             }
             if (filter) query.category = filter
 
